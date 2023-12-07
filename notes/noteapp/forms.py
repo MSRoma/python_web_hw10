@@ -1,5 +1,5 @@
 from django.forms import ModelForm, CharField, TextInput, DateField
-from .models import Tag, Note ,Author_note
+from .models import Tag, Note
 
 
 class TagForm(ModelForm):
@@ -8,23 +8,28 @@ class TagForm(ModelForm):
     
     class Meta:
         model = Tag
-        fields = ['nametag']
+        fields = ['name']
+
+class AuthorForm(ModelForm):
+
+    fullname = CharField(min_length=10, max_length=250, required=True, widget=TextInput())
+    born_date = DateField()
+    born_location = CharField(min_length=10, max_length=250, required=True, widget=TextInput())
+    description = CharField(min_length=10, max_length=500, required=True, widget=TextInput())
+
+    class Meta:
+        model = Note
+        fields = ['fullname','born_location','description']
+
+
 
 class NoteForm(ModelForm):
 
-   # name = CharField(min_length=5, max_length=50, required=True, widget=TextInput())
+    #name = CharField(min_length=5, max_length=50, required=True, widget=TextInput())
     description = CharField(min_length=10, max_length=500, required=True, widget=TextInput())
 
     class Meta:
         model = Note
         fields = ['description']
-        exclude = ['tags', 'authors']
+        exclude = ['tags','authors']
 
-class AuthorForm(ModelForm):
-    fullname = CharField(min_length=10, max_length=250, required=True, widget=TextInput())
-    born_date = CharField(min_length=10, max_length=250, required=True, widget=TextInput())
-    description = CharField(min_length=10, max_length=500, required=True, widget=TextInput())
-
-    class Meta:
-        model = Author_note
-        fields = ['fullname', 'born_date', 'born_location', 'description']

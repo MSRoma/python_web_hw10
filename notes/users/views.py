@@ -15,7 +15,7 @@ def signupuser(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect(to='noteapp:main')
+            return redirect(to='users:login')
         else:
             return render(request, 'users/signup.html', context={"form": form})
 

@@ -4,37 +4,33 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class Tag(models.Model):
-    nametag = models.CharField(max_length=25, null=False)
+    name = models.CharField(max_length=50, null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['user', 'nametag'], name='tag of username')
+            models.UniqueConstraint(fields=['user', 'name'], name='tag of username')
         ]
 
     def __str__(self):
-        return f"{self.nametag}"
+        return f"{self.name}"
     
-class Author_note(models.Model):
+class Author(models.Model):
     fullname = models.CharField(max_length=250, null=False)
     born_date = models.DateTimeField()
     born_location = models.CharField(max_length=250, null=False)
-    description = models.CharField(max_length=250, null=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
-    
+    description = models.TextField(max_length=1000, null=False)
+
     def __str__(self):
         return f"{self.fullname}"
 
-
 class Note(models.Model):
-    description = models.CharField(max_length=150, null=False)
+    description = models.TextField(max_length=1000, null=False)
     done = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     tags = models.ManyToManyField(Tag)
-    authors = models.ManyToManyField(Author_note)
+    authors = models.ManyToManyField(Author)
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     def __str__(self):
         return f"{self.description}"
-    
-

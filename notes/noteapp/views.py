@@ -1,14 +1,34 @@
+from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import TagForm ,NoteForm
-from .models import Tag, Note
+from .forms import TagForm ,NoteForm, AuthorForm
+from .models import Tag, Note , Author
+
+
+from itertools import count
+from django.core.management.base import BaseCommand
+import json
+from noteapp.models import Tag, Author, Note
+import datetime
+from datetime import datetime
+
 
 # Create your views here.
 def main(request):
-    notes = Note.objects.filter(user=request.user).all() if request.user.is_authenticated else []
-    return render(request, 'noteapp/index.html', {"notes": notes})
+    notes = Note.objects.all()
+    tags = Tag.objects.filter().order_by()[:10]
 
-@login_required
+    paginator = Paginator(notes, 5)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+
+#users = User.objects.filter(  # WHERE    first_name='John',).order_by(  # ORDER BY    '-last_name')[:10]  # LIMIT
+
+
+    return render(request, 'noteapp/index.html', {"page_obj": page_obj,"tags": tags})
+
+#@login_required
 def tag(request):
     if request.method == 'POST':
         form = TagForm(request.POST)
@@ -19,15 +39,19 @@ def tag(request):
             return redirect(to='noteapp:main')
         else:
             return render(request, 'noteapp/tag.html', {'form': form})
-
+   
     return render(request, 'noteapp/tag.html', {'form': TagForm()})
 
-@login_required
+#@login_required
 def note(request):
-    tags = Tag.objects.filter(user=request.user).all()
+    # tags = Tag.objects.filter(user=request.user).all()
+    # authors = Author.objects.filter(user=request.user).all()
+    tags = Tag.objects.all()
+    authors = Author.objects.all()
 
     if request.method == 'POST':
         form = NoteForm(request.POST)
+        print(form)
         if form.is_valid():
             new_note = form.save(commit=False)
             new_note.user = request.user
@@ -39,13 +63,33 @@ def note(request):
             return redirect(to='noteapp:main')
         else:
             return render(request, 'noteapp/note.html', {"tags": tags, 'form': form})
-
-    return render(request, 'noteapp/note.html', {"tags": tags, 'form': NoteForm()})
+    
+   
+    
+    return render(request, 'noteapp/note.html', {"tags": tags,"authors": authors, 'form': NoteForm(),'form': AuthorForm()})
 
 @login_required
-def detail(request, note_id):
-    note = get_object_or_404(Note, pk=note_id, user=request.user)
-    return render(request, 'noteapp/detail.html', {"note": note})
+def author(request):
+    if request.method == 'POST':
+        form = AuthorForm(request.POST)
+        
+        if form.is_valid():
+            new_author = form.save(commit=False)
+            new_author.user = request.user
+            new_author.save()
+            return redirect(to='noteapp:main')
+        else:
+            return render(request, 'noteapp/author.html', {'form': form})
+    
+    return render(request, 'noteapp/author.html', {'form': AuthorForm()})
+
+#@login_required
+def detail(request, note_id ):
+
+    author_ = Author.objects.get(id=note_id)
+
+   # author = get_object_or_404(Author, pk=author_id)
+    return render(request, 'noteapp/detail.html', {"author": author_ })
 
 @login_required
 def set_done(request, note_id):
