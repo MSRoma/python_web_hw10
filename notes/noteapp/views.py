@@ -14,10 +14,17 @@ from datetime import datetime
 
 
 # Create your views here.
-def main(request):
-    notes = Note.objects.all()
-    tags = Tag.objects.filter().order_by()[:10]
+def main(request, tag = 0):
+    if request.method != 'POST':
+        print(request.POST)
+        notes = Note.objects.all()
+        tags = Tag.objects.filter().order_by()[:10]
 
+    else:
+        print(request.POST)
+        notes = Note.objects.all()
+        tags = Tag.objects.filter().order_by()[:10]
+        
     paginator = Paginator(notes, 5)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
@@ -46,27 +53,21 @@ def tag(request):
 def note(request):
     # tags = Tag.objects.filter(user=request.user).all()
     # authors = Author.objects.filter(user=request.user).all()
-    tags = Tag.objects.all()
-    authors = Author.objects.all()
+    # tags = Tag.objects.all()
+    # authors = Author.objects.all()
 
     if request.method == 'POST':
         form = NoteForm(request.POST)
-        print(form)
         if form.is_valid():
+            print(f"NOTE FORM valid")
             new_note = form.save(commit=False)
             new_note.user = request.user
             new_note.save()
-            choice_tags = Tag.objects.filter(name__in=request.POST.getlist('tags'), user=request.user)
-            for tag in choice_tags.iterator():
-                new_note.tags.add(tag)
-
             return redirect(to='noteapp:main')
         else:
-            return render(request, 'noteapp/note.html', {"tags": tags, 'form': form})
+            return render(request, 'noteapp/note.html', {'form': form})
     
-   
-    
-    return render(request, 'noteapp/note.html', {"tags": tags,"authors": authors, 'form': NoteForm(),'form': AuthorForm()})
+    return render(request, 'noteapp/note.html', {'form': NoteForm()})
 
 @login_required
 def author(request):
@@ -74,9 +75,8 @@ def author(request):
         form = AuthorForm(request.POST)
         
         if form.is_valid():
-            new_author = form.save(commit=False)
-            new_author.user = request.user
-            new_author.save()
+            print(f"AUTHOR FORM valid")
+            form.save()
             return redirect(to='noteapp:main')
         else:
             return render(request, 'noteapp/author.html', {'form': form})

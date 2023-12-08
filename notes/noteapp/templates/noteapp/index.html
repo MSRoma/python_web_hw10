@@ -13,12 +13,13 @@
     <div class="row header-box">
         <div class="col-md-8">
             <h1>
-                <a href="{% url 'noteapp:main' %}" style="text-decoration: none">Quotes to Scrape</a>
+                <a href="{% url 'noteapp:main'  %}" style="text-decoration: none">Quotes to Scrape</a>
+                <h4>{% now "jS F Y H:i" %}</h4>
             </h1>
         </div>
         <div class="col-md-4">
             <p>
-
+                 
                 {% if user.is_authenticated %}
                 <li>
                 <a href="{% url 'noteapp:author' %}" role="button"> Add Author </a>
@@ -53,9 +54,9 @@
                    
                     {% load extract_authors %}
 
-                    <span>by <small class="author" itemprop="author">{{note.authors|authors }} </small>
+                    <span>by <small class="author" itemprop="author">{{note.author}} </small>
                        
-                        <a href="{% url 'noteapp:detail' note.id  %}"> (about)</a>
+                        <a href="{% url 'noteapp:detail' note.author.id  %}"> (about)</a>
                         
                        
                     </span>
@@ -65,8 +66,9 @@
                         {% load extract_tags %}
                         
                             {% for tag_ in note.tags|tags%}
-                               <a class="tag"> {{ tag_ }} </a>
                                
+                               <a class="tag" href="{% url 'noteapp:main'  %}">{{ tag_ }} </a>
+                             
                             {% endfor %}
                         
                     </div>    
@@ -93,6 +95,7 @@
                                 {% for p in page_obj.paginator.page_range %}
                                 <li>
                                     <a href="?page={{ p }}">{{ p }}</a>
+                                    
                                 </li>
                                 {% endfor %}
                           

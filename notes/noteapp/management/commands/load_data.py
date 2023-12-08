@@ -13,29 +13,51 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         
-        with open('noteapp/management/commands/authors.json', 'rb') as f:
-            data = json.load(f)
+        # with open('noteapp/management/commands/authors.json', 'rb') as f:
+        #     data = json.load(f)
             
-            for el in data:
-                born_date_j = datetime.strptime(el.get('born_date'),"%B %d, %Y")
-                born_date_j = born_date_j.date()
-                author = Author(fullname=el.get('fullname'), born_date=born_date_j,
-                                born_location=el.get('born_location'), description=el.get('description'))
-                author.save()
-        
-        
+        #     for el in data:
+        #         born_date_j = datetime.strptime(el.get('born_date'),"%B %d, %Y")
+        #         born_date_j = born_date_j.date()
+        #         author = Author(fullname=el.get('fullname'), born_date=born_date_j,
+        #                         born_location=el.get('born_location'), description=el.get('description'))
+        #         author.save()
+
         with open('noteapp/management/commands/quotes.json', 'rb') as q:
             data = json.load(q)
-            tags_ = set()
-            for el in data:  
-                note = Note(description=el.get('quote'))
-                note.save()
-                for i in el.get('tags'):
-                    tag = Tag(name=i)
-                    tags_.add(i)
-            for l in tags_: 
-                tag = Tag(name=l)   
-                tag.save()
+
+            for quote in data:
+                tags = []
+                for tag in quote['tags']:
+                    t, *_ = Tag.objects.get_or_create(name=tag)
+                    tags.append(t)
+
+                exist_quote = bool(len(Note.objects.filter(description=quote['quote'])))
+                try:
+                    if not exist_quote:
+                        a = Author.objects.get(fullname=quote['author'])
+                        q = Note.objects.create(
+                            description=quote['quote'],
+                            author=a
+                        )
+                        for tag in tags:
+                            q.tags.add(tag)
+                except:
+                    print("err")
+        
+        # with open('noteapp/management/commands/quotes.json', 'rb') as q:
+        #     data = json.load(q)
+
+        #     tags_ = set()
+        #     for el in data:  
+        #         note = Note(description=el.get('quote'))
+        #         note.save()
+        #         for i in el.get('tags'):
+        #             tag = Tag(name=i)
+        #             tags_.add(i)
+        #     for l in tags_: 
+        #         tag = Tag(name=l)   
+        #         tag.save()
 
         # with open('noteapp/management/commands/quotes.json', 'rb') as q:
         #     data = json.load(q)

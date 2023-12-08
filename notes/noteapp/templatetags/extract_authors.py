@@ -15,8 +15,7 @@ def authors(note_authors):
     
     # return list_ 
     return ', '.join([str(name) for name in note_authors.all()])
-def authors_2(note_authors):
-    return f"hhhhhhhhhhhhhhhhh"
+
 
 #register.filter('authors', authors)    note_authors.values_list( "id","fullname")
 register.filter('authors', authors)

@@ -17,7 +17,7 @@ class Tag(models.Model):
     
 class Author(models.Model):
     fullname = models.CharField(max_length=250, null=False)
-    born_date = models.DateTimeField()
+    born_date = models.CharField(max_length=250, null=False)
     born_location = models.CharField(max_length=250, null=False)
     description = models.TextField(max_length=1000, null=False)
 
@@ -29,8 +29,9 @@ class Note(models.Model):
     done = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     tags = models.ManyToManyField(Tag)
-    authors = models.ManyToManyField(Author)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, default=None, null=True) # тут не треба мані ту мани
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     def __str__(self):
         return f"{self.description}"
+    
